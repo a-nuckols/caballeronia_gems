@@ -25,7 +25,7 @@ conda install -c bioconda blast
 conda install -c bioconda Bio
 ```
 
-## Downloading Genome Sequences and Making BLAST Databases
+## Downloading Genome Sequences
 
 The RefSeq genome annotation features (.gtf), genome sequences, genomic coding sequences, and proteins were downloaded from NCBI for Cablleronia str. [GAOx1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_023631065.1/) and [Sq4a](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_023170545.1/), and for E. coli str. K-12 substr. [MG1655](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000005845.2/). These were transfered to the Emory Biology Server. 
 
@@ -36,6 +36,8 @@ To simplify the BLAST process, sequence identifiers need to be reformatted from 
 (microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ python3 reformat_fasta.py
 ```
 reformat_fasta.py can be found in the python folder of this repository. This code outputs to the directory aenucko@bio:/data/ngerard/GEMs/microbial/BLAST/genome_fasta/. For each strain (GAOx1, Sq4a, and MG1655), two fasta files are created (one containing cds and the other containing protein sequences, each identified with gene locus tags) and a metadata tsv file containing all of the gene information associated with the locus tag (gene, protein, protein_id, etc).
+
+## Making BLAST Databases
 
 To make the BLAST databases for each microbial strain, run the following commands:
 
@@ -69,6 +71,41 @@ ls
 ```
 The output should look something like this:
 > GAOx1_blastdb.pdb  GAOx1_blastdb.phr  GAOx1_blastdb.pin  GAOx1_blastdb.pot  GAOx1_blastdb.psq  GAOx1_blastdb.ptf  GAOx1_blastdb.pto
+
+## Running BLAST Searches
+
+I wrote a bash script, named blast_search.sh, and ran it with SLURM to perform my BLAST searches. My bash script looked like this:
+
+**Bash**
+```
+#!/bin/bash
+#SBATCH --partition=day-long
+
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate microbial_GEMs
+
+blastp -query genome_fasta/Sq4a_proteins.faa -db blastdb/MG1655_blastdb/MG1655_blastdb -outfmt 6 -out blast_results/Sq4a/Sq4a_against_MG1655
+blastp -query genome_fasta/MG1655_proteins.faa -db blastdb/Sq4a_blastdb/Sq4a_blastdb -outfmt 6 -out blast_results/Sq4a/MG1655_against_Sq4a
+
+blastp -query genome_fasta/GAOx1_proteins.faa -db blastdb/MG1655_blastdb/MG1655_blastdb -outfmt 6 -out blast_results/GAOx1/GAOx1_against_MG1655
+blastp -query genome_fasta/MG1655_proteins.faa -db blastdb/GAOx1_blastdb/GAOx1_blastdb -outfmt 6 -out blast_results/GAOx1/MG1655_against_GAOx1
+
+conda deactivate
+```
+To run the script, I ran:
+
+**Bash**
+```
+sbatch blast_search.sh
+```
+
+
+
+
+
+
+
+
 
 
 
