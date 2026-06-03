@@ -117,15 +117,32 @@ The paper referenced above uses the following criteria for BLAST hits:
 
 Additionally, the paper uses reciprocal BLAST hits, meaning the match must be a hit with MG1655 as the subject and the query. 
 
-For some basic statistics regarding BLAST hits, I wrote a python script that filters the BLAST hits for the above criteria, then counts how many hits each query sequence got (both with Cab and E. coli as the query).
+For some basic statistics regarding BLAST hits, I wrote a python script that filters the BLAST hits for the above criteria, then counts how many hits each query sequence got (both with Cab and E. coli as the query). It then outputs the max number of hits for a query, the mean number of hits, the median number of hits, the number of query sequences with more than one hit, and the total number of query sequences with hits.
 
 **Bash**
 ```
 python3 count_hits.py
 ```
+The output: 
+> Sq4a: 
+>> As query:
+>>> MAX: 18, MEAN: 1.5998766954377313, MED: 1.0, NUM>1: 380, NUM: 1622
+>>
+>> As target:
+>>> MAX: 19, MEAN: 1.777394900068918, MED: 1.0, NUM>1: 381, NUM: 1451
+> 
+> GAOx1:
+>>As query:
+>>> MAX: 17, MEAN: 1.6579945799457994, MED: 1.0, NUM>1: 453, NUM: 1845
+>>
+>> As target:
+>>> MAX: 30, MEAN: 1.9921824104234527, MED: 1.0, NUM>1: 432, NUM: 1535
 
+The script will also output the filtered tables as tsv files. 
 
+## Matching Sequences
 
+In order to use BLAST homology to pull reactions from the iJO1366 GEM, I need to create a list of MG1655 genes with reciprocal hits that were not filtered out, and determine which ones have corresponding reactions in iJO1366. Through manual inspection of that list, I will determine whether the filters need to be adjusted. 
 
 
 
