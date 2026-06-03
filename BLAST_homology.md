@@ -98,12 +98,31 @@ To run the script, I ran:
 ```
 sbatch blast_search.sh
 ```
+This code results in a table like the one below outputted to the location specified with the -out argument.
 
+| qseqid | sseqid | pident | length | mismatch | gapopen | qstart | qend | sstart | send | evalue | bitscore |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| NCS66_RS00300 | b3251 | 71.143 | 350 | 95 | 3 | 1 | 347 | 1 | 347 | 0.0 | 506 |
+| NCS66_RS00300 | b2526 | 27.126 | 247 | 139 | 9 | 15 | 223 | 24 | 267 | 1.65e-13 | 68.2 |
+| NCS66_RS00300 | b0650 | 27.358 | 212 | 128 | 7 | 13 | 203 | 8 | 214 | 2.35e-11 | 61.6 |
 
+## Summarizing BLAST hits
 
+This table contains all of the BLAST hits for every query sequence. For model construction, I need to fine tune the level of scrutiny with which I will "accept" BLAST hits in order to minimize necessary gap filling while maintaining accuracy for what reactions the Caballeronia strains are capable of.
 
+The paper referenced above uses the following criteria for BLAST hits: 
+* At least 35% amino acid sequence identity
+* E value less than 1e-5
+* At least 70% coverage of both query and subject
 
+Additionally, the paper uses reciprocal BLAST hits, meaning the match must be a hit with MG1655 as the subject and the query. 
 
+For some basic statistics regarding BLAST hits, I wrote a python script that filters the BLAST hits for the above criteria, then counts how many hits each query sequence got (both with Cab and E. coli as the query).
+
+**Bash**
+```
+python3 count_hits.py
+```
 
 
 
