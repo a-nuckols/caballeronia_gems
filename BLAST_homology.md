@@ -144,6 +144,20 @@ The script will also output the filtered tables as tsv files.
 
 In order to use BLAST homology to pull reactions from the iJO1366 GEM, I need to create a list of MG1655 genes with reciprocal hits that were not filtered out, and determine which ones have corresponding reactions in iJO1366. Through manual inspection of that list, I will determine whether the filters need to be adjusted. 
 
+match_hits.py is the python script I wrote. It outputs a tsv file containing all reciprocal BLAST hits and a tsv file containing the draft reconstruction reactions (GPRs not updated from iJO1366). Additionally, the number of reactions included for each draft reconstruction is printed. 
+
+**Bash**
+```
+python3 match_hits.py
+```
+
+Output:
+> Sq4a: 
+>>total reactions kept: 891
+>
+>GAOx1: 
+>>total reactions kept: 934
+
 
 
 
