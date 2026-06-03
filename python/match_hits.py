@@ -21,6 +21,9 @@ strains = ['Sq4a', 'GAOx1']
 for strain in strains:
     as_query_tsv = f"blast_results/{strain}/filtered/{strain}_against_MG1655_filtered.tsv"
     as_target_tsv = f"blast_results/{strain}/filtered/MG1655_against_{strain}_filtered.tsv"
+    draft_output_tsv = f"draft_models/{strain}_draft_rxn_list.tsv"
+    final_blast_out = f"draft_models/{strain}_draft_blast_hits.tsv"
+    final_blast_out2 = f"blast_results/{strain}/matched/{strain}_draft_blast_hits.tsv"
 
     as_query = pd.read_csv(as_query_tsv, sep='\t')
     as_target = pd.read_csv(as_target_tsv, sep='\t')
@@ -46,9 +49,24 @@ for strain in strains:
         lambda rule: eval_rule(rule, gene_set) if isinstance(rule, str) else False
     )
 
-    strain_draft_model = iJO1366[mask]    
-    print(strain)
-    print(len(strain_draft_model))
+    strain_draft_model = iJO1366[mask]
+    print(f'{strain}: ')
+    print(f'total reactions kept: {len(strain_draft_model)}')    
+    strain_draft_model.to_csv(
+        draft_output_tsv,
+        sep='\t',
+        index=False
+    )
+    final_blast_df.to_csv(
+        final_blast_out,
+        sep='\t',
+        index=False
+    )
+    final_blast_df.to_csv(
+        final_blast_out2,
+        sep='\t',
+        index=False
+    )
 
 
 
