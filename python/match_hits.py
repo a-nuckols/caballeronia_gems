@@ -5,14 +5,10 @@ import re
 def eval_rule(rule, genes):
     if not isinstance(rule, str):
         return False
-
     genes = set(genes)
-
     tokens = set(re.findall(r'[a-z]\d+', rule))
-
     for gene in tokens:
         rule = re.sub(rf'\b{gene}\b', str(gene in genes), rule)
-
     try:
         return eval(rule)
     except Exception:
@@ -53,5 +49,6 @@ for strain in strains:
     strain_draft_model = iJO1366[mask]    
     print(strain)
     print(len(strain_draft_model))
+
 
 
