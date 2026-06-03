@@ -44,7 +44,7 @@ for strain in strains:
         sep='\t'
     )
 
-    gtf_gaps = gtf[not gtf['gene_id'].isin(blast_hits['qseqid'])]
+    gtf_gaps = gtf[~gtf['gene_id'].isin(set(blast_hits['qseqid']))]
 
     gtf_gaps.to_csv(
         f'draft_models/gap_genes/{strain}_gap_genes.tsv',
