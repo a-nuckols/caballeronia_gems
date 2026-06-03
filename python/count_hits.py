@@ -35,6 +35,15 @@ for strain in strains:
     as_query_filtered = as_query_df.query("(evalue < 1e-5) & (pident >= 35) & (qcoverage >=70) & (scoverage >= 70)")
     as_target_filtered = as_target_df.query("(evalue < 1e-5) & (pident >= 35) & (qcoverage >=70) & (scoverage >= 70)")
 
+    as_query_filtered.to_csv(
+        f"blast_results/{strain}/filtered/{strain}_against_MG1655_filtered.tsv", 
+        sep = "\t",
+        index=False)
+    as_target_filtered.to_csv(
+        f"blast_results/{strain}/filtered/MG1655_against_{strain}_filtered.tsv", 
+        sep = "\t",
+        index=False)
+
     as_query_summary = as_query_filtered.groupby('qseqid').size().to_frame('num')
     as_target_summary = as_target_filtered.groupby('qseqid').size().to_frame('num')
 
