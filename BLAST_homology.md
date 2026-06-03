@@ -1,0 +1,136 @@
+# Create Genome-Scale Metabolic Model Using BLAST Homology Search
+
+## Description
+
+Follows microbial metabolic-model reconstruction protocol outlined in [Ankrah, N. Y. D., Luan, J., and Douglas, A. E. (2017)](https://doi.org/10.1128/jb.00872-16).
+
+I performed reciprocal BLAST searches of the Caballeronia genomes against E. coli str. K-12 substr. MG1655, determining orthologous genes. In the case of bidirectional gene matches, the associated reactions from the E. coli str. K-12 substr. MG1655 GEM, iJO1366, were included in the Caballeronia metabolic-model reconstruction if: E value < 1e-5, AA sequence identity > 35%, and match length > 70% for both subject and query sequences.
+
+This process was completed on the Emory Biology Server.
+
+## Installing BLAST+ Suite
+
+First, create a conda environment.
+
+**Bash**
+```
+conda create -n microbial_GEMs
+conda activate microbial_GEMs
+```
+Then, install blast and Bio from bioconda.
+
+**Bash**
+```
+conda install -c bioconda blast
+conda install -c bioconda Bio
+```
+
+## Downloading Genome Sequences
+
+The RefSeq genome annotation features (.gtf), genome sequences, genomic coding sequences, and proteins were downloaded from NCBI for Cablleronia str. [GAOx1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_023631065.1/) and [Sq4a](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_023170545.1/), and for E. coli str. K-12 substr. [MG1655](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000005845.2/). These were transfered to the Emory Biology Server. 
+
+To simplify the BLAST process, sequence identifiers need to be reformatted from their standard RefSeq formats. GEM iJO1366 uses locus-tags in their gene-reaction associations, so the protein fasta and cds fasta files must be reformatted so the locus tag is the identifier.
+
+**Bash**
+```
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ python3 reformat_fasta.py
+```
+reformat_fasta.py can be found in the python folder of this repository. This code outputs to the directory aenucko@bio:/data/ngerard/GEMs/microbial/BLAST/genome_fasta/. For each strain (GAOx1, Sq4a, and MG1655), two fasta files are created (one containing cds and the other containing protein sequences, each identified with gene locus tags) and a metadata tsv file containing all of the gene information associated with the locus tag (gene, protein, protein_id, etc).
+
+## Making BLAST Databases
+
+To make the BLAST databases for each microbial strain, run the following commands:
+
+**Bash**
+```{bash}
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ makeblastdb \
+    -in genome_fasta/GAOx1_proteins.faa \
+    -title "Caballeronia sp. GAOx1 BLAST database" \
+    -out blastdb/GAOx1_blastdb/GAOx1_blastdb \
+    -dbtype prot
+
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ makeblastdb \
+    -in genome_fasta/Sq4a_proteins.faa \
+    -title "Caballeronia sp. Sq4a BLAST database" \
+    -out blastdb/Sq4a_blastdb/Sq4a_blastdb \
+    -dbtype prot
+
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ makeblastdb \
+    -in genome_fasta/MG1655_proteins.faa \
+    -title "E. coli str. K-12 substr. MG1655 BLAST database" \
+    -out blastdb/MG1655_blastdb/MG1655_blastdb \
+    -dbtype prot
+```
+
+Confirm the databases were created
+
+**Bash**
+```
+cd blastdb/GAOx1_blastdb
+ls
+```
+The output should look something like this:
+> GAOx1_blastdb.pdb  GAOx1_blastdb.phr  GAOx1_blastdb.pin  GAOx1_blastdb.pot  GAOx1_blastdb.psq  GAOx1_blastdb.ptf  GAOx1_blastdb.pto
+
+## Running BLAST Searches
+
+I wrote a bash script, named blast_search.sh, and ran it with SLURM to perform my BLAST searches. My bash script looked like this:
+
+**Bash**
+```
+#!/bin/bash
+#SBATCH --partition=day-long
+
+source ~/miniconda3/etc/profile.d/conda.sh
+conda activate microbial_GEMs
+
+blastp -query genome_fasta/Sq4a_proteins.faa -db blastdb/MG1655_blastdb/MG1655_blastdb -outfmt 6 -out blast_results/Sq4a/Sq4a_against_MG1655
+blastp -query genome_fasta/MG1655_proteins.faa -db blastdb/Sq4a_blastdb/Sq4a_blastdb -outfmt 6 -out blast_results/Sq4a/MG1655_against_Sq4a
+
+blastp -query genome_fasta/GAOx1_proteins.faa -db blastdb/MG1655_blastdb/MG1655_blastdb -outfmt 6 -out blast_results/GAOx1/GAOx1_against_MG1655
+blastp -query genome_fasta/MG1655_proteins.faa -db blastdb/GAOx1_blastdb/GAOx1_blastdb -outfmt 6 -out blast_results/GAOx1/MG1655_against_GAOx1
+
+conda deactivate
+```
+To run the script, I ran:
+
+**Bash**
+```
+sbatch blast_search.sh
+```
+This code results in a table like the one below outputted to the location specified with the -out argument.
+
+| qseqid | sseqid | pident | length | mismatch | gapopen | qstart | qend | sstart | send | evalue | bitscore |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| NCS66_RS00300 | b3251 | 71.143 | 350 | 95 | 3 | 1 | 347 | 1 | 347 | 0.0 | 506 |
+| NCS66_RS00300 | b2526 | 27.126 | 247 | 139 | 9 | 15 | 223 | 24 | 267 | 1.65e-13 | 68.2 |
+| NCS66_RS00300 | b0650 | 27.358 | 212 | 128 | 7 | 13 | 203 | 8 | 214 | 2.35e-11 | 61.6 |
+
+## Summarizing BLAST hits
+
+This table contains all of the BLAST hits for every query sequence. For model construction, I need to fine tune the level of scrutiny with which I will "accept" BLAST hits in order to minimize necessary gap filling while maintaining accuracy for what reactions the Caballeronia strains are capable of.
+
+The paper referenced above uses the following criteria for BLAST hits: 
+* At least 35% amino acid sequence identity
+* E value less than 1e-5
+* At least 70% coverage of both query and subject
+
+Additionally, the paper uses reciprocal BLAST hits, meaning the match must be a hit with MG1655 as the subject and the query. 
+
+For some basic statistics regarding BLAST hits, I wrote a python script that filters the BLAST hits for the above criteria, then counts how many hits each query sequence got (both with Cab and E. coli as the query).
+
+**Bash**
+```
+python3 count_hits.py
+```
+
+
+
+
+
+
+
+
+
+
+
