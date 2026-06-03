@@ -8,7 +8,6 @@ def eval_rule(rule, genes):
 
     genes = set(genes)
 
-    # find ALL gene-like tokens (b####, s####, etc.)
     tokens = set(re.findall(r'[a-z]\d+', rule))
 
     for gene in tokens:
@@ -30,9 +29,6 @@ for strain in strains:
     as_query = pd.read_csv(as_query_tsv, sep='\t')
     as_target = pd.read_csv(as_target_tsv, sep='\t')
 
-# CREATE LIST OF ALL E COLI GENES WITH MATCHES
-# CREATE DICTIONARY OF ALL E COLI GENES AND THEIR MATCHES
-# SUB IN "in list" to GPR AND EVALUTE BOOLEAN 
     final_blast_df = pd.DataFrame(columns=['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore'])
     gene_list = []
     gene_dict = {}
