@@ -140,7 +140,7 @@ The output:
 
 The script will also output the filtered tables as tsv files. 
 
-## Matching Sequences
+## Constructing Draft Model from Reciprocal BLAST Hits
 
 In order to use BLAST homology to pull reactions from the iJO1366 GEM, I need to create a list of MG1655 genes with reciprocal hits that were not filtered out, and determine which ones have corresponding reactions in iJO1366. Through manual inspection of that list, I will determine whether the filters need to be adjusted. 
 
