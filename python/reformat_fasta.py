@@ -44,16 +44,14 @@ for genome in genomes:
         sep='\t',
         index=False
     )
-
     protein_to_locus = dict(
         zip(metadata_df["protein_id"], metadata_df["locus_tag"])
     )
-
+  
     for record in SeqIO.parse(input_protein, "fasta"):
 
         desc = record.description
-        protein_id = desc.split()[0]  # usually NP_XXXX.X
-
+        protein_id = desc.split()[0]
         locus_tag = protein_to_locus.get(protein_id)
 
         if locus_tag is None:

@@ -1,4 +1,5 @@
 import pandas as pd
+from Bio import SeqIO
 
 def parse_attributes(attr_string):
     attrs = {}
@@ -43,9 +44,13 @@ for strain in strains:
         f"draft_models/{strain}_draft_blast_hits.tsv",
         sep='\t'
     )
+    fasta_dict = {}
+    for record in SeqIO.parse(f'genome_fasta/{strain}_proteins.faa', 'fasta'):
+        fasta_dict[record.id] = record.seq
 
     gtf_gaps = gtf[~gtf['gene_id'].isin(set(blast_hits['qseqid']))]
-
+    gtf_gaps = gtf_gaps[gtf_gaps['feature']=='CDS']
+    gtf_gaps['sequence'] = gtf_gaps['gene_id'].map(fasta_dict)
     gtf_gaps.to_csv(
         f'draft_models/gap_genes/{strain}_gap_genes.tsv',
         sep='\t',
