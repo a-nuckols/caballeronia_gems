@@ -68,4 +68,31 @@ for strain in strains:
 
     new_draft_rxn_list.to_csv(orphans_only_draft_out, sep='\t', index=False)
 
-    blast_draft_new = blast_draft[['rxn_id', 'name', 'formula', 'gr', 'subsyste
+    blast_draft_new = blast_draft[['rxn_id', 'name', 'formula', 'gr', 'subsystem', 'EC', 'rev', 'lower', 'upper']]
+    new_draft_rxn_list.columns = ['rxn_id', 'name', 'formula', 'gr', 'subsystem', 'EC', 'rev', 'lower', 'upper']
+
+    combined_draft = pd.concat([blast_draft_new, new_draft_rxn_list])
+    combined_draft.to_csv(combined_draft_out, sep='\t', index=False)
+
+    gtf_gaps_only_in = f'../BLAST/draft_models/gap_genes/{strain}_gap_genes.tsv'
+    eggnog_gaps_only_in = f'eggnog_annotations/{strain}_eggnog_orphans_only.tsv'
+
+    all_gaps_out = f'../gaps/{strain}_gap_genes.tsv'
+    transport_only_out = f'../gaps/transporter_genes/{strain}_transporters.tsv'
+    non_transport_out = f'../gaps/non_transporters/{strain}_non_transporters.tsv'
+
+    gtf_gaps_only = pd.read_csv(gtf_gaps_only_in, sep='\t')
+    remaining_gaps = gtf_gaps_only[['locus_tag', 'product', 'protein_id', 'go_function', 'go_process', 'go_component', 'gene']]
+
+    eggnog_gaps_only = pd.read_csv(eggnog_gaps_only_in, sep='\t')
+    eggnog_gaps_only = eggnog_gaps_only[['locus_tag','GOs', 'Description', 'KEGG_ko', 'KEGG_Module', 'BRITE', 'KEGG_TC', 'CAZy', 'PFAMs']]
+
+    gap_filling_df = pd.merge(remaining_gaps, eggnog_gaps_only, on='locus_tag')
+    gap_filling_df = gap_filling_df[~gap_filling_df['locus_tag'].isin(orphan_gene_set)]
+
+    transport_genes = gap_filling_df.query('KEGG_TC != "-"')
+    non_transport_genes = gap_filling_df.query('KEGG_TC == "-"')
+
+    gap_filling_df.to_csv(all_gaps_out, sep='\t', index=False)
+    transport_genes.to_csv(transport_only_out, sep='\t', index=False)
+    non_transport_genes.to_csv(non_transport_out, sep='\t', index=False)
