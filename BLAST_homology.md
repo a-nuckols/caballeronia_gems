@@ -158,7 +158,7 @@ Output:
 >GAOx1: 
 >>total reactions kept: 934
 
-## Assigning Function to Orphan Genes
+## Assigning Reactions to Orphan Genes
 
 BLAST homology search assigned 891 total reactions for Sq4a and 934 total reactions for GAOx1. However, the majority of genes for each strain are not assigned reactions, called orphan genes. While many of these are structural or signal proteins, there are many which may catalyze reactions but have no direct homolog in MG1655. Firstly, using the python script, gtf_to_tsv.py, I created a tsv file containing only the orphan genes. 
 
@@ -185,6 +185,8 @@ Output:
 >> NUMBER OF GENES: 382
 >> 
 >> NUMBER OF REACTIONS: 544
+
+## Updating Draft Reconstruction and Organizing Gap Genes
 
 
 
