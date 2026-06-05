@@ -158,9 +158,33 @@ Output:
 >GAOx1: 
 >>total reactions kept: 934
 
+## Assigning Function to Orphan Genes
 
+BLAST homology search assigned 891 total reactions for Sq4a and 934 total reactions for GAOx1. However, the majority of genes for each strain are not assigned reactions, called orphan genes. While many of these are structural or signal proteins, there are many which may catalyze reactions but have no direct homolog in MG1655. Firstly, using the python script, gtf_to_tsv.py, I created a tsv file containing only the orphan genes. 
 
+**Bash**
+```
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/BLAST$ python3 gtf_to_tsv.py
+```
 
+Next, we need to go about assigning reactions to these orphan genes. Eggnog-mapper is an annotation software that assigns functional annotations to microbial genomes, including EC numbers, KEGG orthology terms, and KEGG reactions ids associated with the KO terms. Using the eggnog annotation csv file (eggnog annotations performed in Galaxy), for GAOx1 and Sq4a, I extracted KEGG reaction ids for orphan genes when they were present and mapped them to BiGG reaction ids, by cross referencing through MetaNetX. The script that performs this task is egg_to_rxns.py
+
+For each strain, this script outputs three files: strain_reaction_set.txt containing a list of all BiGG reaction ids found from orphan genes, strain_gene_set.txt containing a list of all genes found to be associated with these reactions, and strain_genes_reactions.json containing a dictionary where each key is a BiGG reaction id, and each value is the list of genes associated with that reaction.
+
+**Bash**
+```
+(microbial_GEMs) aenucko@bio:/data/ngerard/GEMs/microbial/orphan_genes$ python3 egg_to_rxns.py
+```
+Output:
+> Sq4a:
+>> NUMBER OF GENES: 284
+>> 
+>> NUMBER OF REACTIONS: 465
+>
+> GAOx1:
+>> NUMBER OF GENES: 382
+>> 
+>> NUMBER OF REACTIONS: 544
 
 
 
