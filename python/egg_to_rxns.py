@@ -49,6 +49,8 @@ for strain in strains:
     eggnog_locus = eggnog_locus[eggnog_protein.columns]
     eggnog = pd.concat([eggnog_protein, eggnog_locus])
     eggnog = eggnog[eggnog['locus_tag'].isin(orphans['gene_id'])]
+    
+    eggnog.to_csv(f'eggnog_annotations/{strain}_eggnog_orphans_only.tsv', sep='\t', index=False)
 
     kegg_rxns = {}
     all_rxns = []
